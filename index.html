@@ -669,6 +669,7 @@ document.querySelectorAll('.si').forEach(function(a){
 
 function doRefresh(){
  var btn=document.getElementById('refreshBtn');
+ // try local server first, fallback to static mode hint
  btn.classList.add('loading');
  btn.querySelector('.spin').textContent='⏳';
  fetch('/refresh',{method:'POST'})
@@ -678,8 +679,8 @@ function doRefresh(){
   else{alert('采集失败: '+(d.error||''));btn.classList.remove('loading');btn.querySelector('.spin').textContent='🔄';};
  })
  .catch(function(e){
-  alert('请先启动服务：python3 server.py');
   btn.classList.remove('loading');btn.querySelector('.spin').textContent='🔄';
+  alert('页面由定时任务自动更新，无需手动刷新。\n最近更新时间见顶部。');
  });
 }
 </script>
