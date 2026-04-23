@@ -88,7 +88,8 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 .hidden{display:none!important}
 @media(max-width:1024px){
  .wrap{flex-direction:column}
- .live{width:100%;min-width:0;height:auto;max-height:500px;position:relative;top:0;border-left:none;border-top:2px solid #1a1a2e;order:1}
+ .side{display:none}
+ .live{width:100%;min-width:0;height:auto;max-height:400px;position:relative;top:0;border-left:none;border-top:2px solid #1a1a2e;order:1}
  .main{order:2}
 }
 @media(max-width:768px){
@@ -103,12 +104,6 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 <h1>📋 纵览新闻 · 文娱选题看板</h1>
 <div class="meta">采集 2026-04-23 15:17 · 59条 · 高22 中33 低4</div>
 </div><div class="hd-right">
-<div class="tf">
-<button class="tb on" data-h="0">全部</button>
-<button class="tb" data-h="6">6h</button>
-<button class="tb" data-h="12">12h</button>
-<button class="tb" data-h="24">24h</button>
-</div>
 <button class="refresh-btn" id="refreshBtn" onclick="doRefresh()"><span class="spin">🔄</span> 刷新采集</button>
 </div></div></div>
 
@@ -957,14 +952,12 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 
 <script>
 (function(){
-var cA='all',cH=0,cP='all';
-var ft=new Date('2026-04-23T15:17:00');
+var cA='all',cP='all';
 function run(){
  document.querySelectorAll('.tl-row').forEach(function(el){
   var ok=true;
   if(cA!=='all'&&el.dataset.a!==cA)ok=false;
   if(cP!=='all'&&el.dataset.p!==cP)ok=false;
-  if(cH>0){var d=new Date(el.dataset.t);if((ft-d)/36e5>cH)ok=false;}
   el.classList.toggle('hidden',!ok);
  });
  document.querySelectorAll('.date-sep').forEach(function(sep){
@@ -975,9 +968,6 @@ function run(){
 }
 document.querySelectorAll('.fb[data-f]').forEach(function(b){
  b.onclick=function(){document.querySelectorAll('.fb').forEach(function(x){x.classList.remove('active')});b.classList.add('active');cA=b.dataset.f;run();};
-});
-document.querySelectorAll('.tb[data-h]').forEach(function(b){
- b.onclick=function(){document.querySelectorAll('.tb').forEach(function(x){x.classList.remove('on')});b.classList.add('on');cH=+b.dataset.h;run();};
 });
 document.querySelectorAll('.sb').forEach(function(b){
  b.onclick=function(){
