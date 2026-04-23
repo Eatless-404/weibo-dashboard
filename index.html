@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>纵览新闻 · 文娱选题看板</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;background:#f3f4f6;color:#333;font-size:14px}
+
+.hd{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);color:#fff;padding:14px 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+.hr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.hd h1{font-size:18px} .hd .meta{font-size:11px;color:#aaa;margin-top:1px}
+.hd-right{display:flex;align-items:center;gap:10px}
+.tf{display:flex;gap:5px}
+.tb{padding:4px 13px;border:1px solid rgba(255,255,255,.25);border-radius:16px;background:0;color:#bbb;font-size:12px;cursor:pointer;transition:.2s}
+.tb:hover{border-color:#fff;color:#fff}
+.tb.on{background:rgba(255,255,255,.18);color:#fff;border-color:#fff}
+.refresh-btn{padding:5px 14px;border:1px solid rgba(255,255,255,.4);border-radius:16px;background:rgba(255,255,255,.1);color:#fff;font-size:12px;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:4px}
+.refresh-btn:hover{background:rgba(255,255,255,.2);border-color:#fff}
+.refresh-btn.loading{opacity:.6;pointer-events:none}
+.refresh-btn .spin{display:inline-block}
+.refresh-btn.loading .spin{animation:spin 1s linear infinite}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+.wrap{display:flex;min-height:calc(100vh - 56px)}
+
+.side{width:200px;min-width:200px;background:#fff;border-right:1px solid #e5e5e5;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;padding:10px 0;flex-shrink:0}
+.sb{display:flex;align-items:center;gap:5px;width:100%;padding:7px 12px;font-size:12px;font-weight:600;color:#333;background:0;border:none;border-left:3px solid var(--c);cursor:pointer;text-align:left}
+.sb:hover,.sb.on{background:color-mix(in srgb,var(--c) 10%,white)}
+.sc{margin-left:auto;background:#eee;padding:1px 6px;border-radius:8px;font-size:10px;color:#666}
+.sdiv{height:1px;background:#eee;margin:8px 10px}
+.side-date{font-size:11px;font-weight:700;color:#333;padding:10px 12px 4px;background:#fafafa;border-top:1px solid #eee;margin-top:4px}
+.si{display:flex;align-items:center;gap:5px;padding:5px 12px;font-size:11px;color:#888;text-decoration:none;white-space:nowrap;overflow:hidden}
+.si:hover{background:#f5f5f5;color:#333}
+.si-t{min-width:42px;color:#aaa;font-variant-numeric:tabular-nums}
+.si-d{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.si-x{overflow:hidden;text-overflow:ellipsis}
+
+.main{flex:1;min-width:0}
+.bar{background:#fff;padding:8px 20px;border-bottom:1px solid #e5e5e5;position:sticky;top:56px;z-index:99;display:flex;gap:5px;flex-wrap:wrap}
+.fb{padding:3px 10px;border:1px solid #ddd;border-radius:14px;background:#fff;font-size:11px;cursor:pointer;transition:.2s}
+.fb:hover{border-color:#666} .fb.active{background:#1a1a2e;color:#fff;border-color:#1a1a2e}
+
+.ct{padding:0 24px 24px;max-width:820px}
+
+.date-sep{padding:28px 0 12px 100px;position:relative}
+.date-label{font-size:15px;font-weight:800;color:#1a1a2e;background:#f3f4f6;padding:0 16px 0 0;position:relative;z-index:1;letter-spacing:.5px}
+.date-sep::after{content:'';position:absolute;left:100px;right:0;top:60%;height:2px;background:linear-gradient(90deg,#1a1a2e 0%,#e0e0e0 40%,transparent 100%)}
+
+.tl-row{display:flex;gap:0;position:relative}
+.tl-time{width:88px;min-width:88px;padding:18px 12px 18px 0;text-align:right;position:relative}
+.hm{font-size:14px;font-weight:700;color:#555;font-variant-numeric:tabular-nums;letter-spacing:.5px}
+.tl-dot{display:block;width:10px;height:10px;border-radius:50%;position:absolute;right:-5px;top:22px;z-index:2;box-shadow:0 0 0 3px #f3f4f6}
+.tl-row::before{content:'';position:absolute;left:88px;top:0;bottom:0;width:1px;background:#ddd;z-index:1}
+
+.card-a{flex:1;text-decoration:none;color:inherit;display:block;min-width:0;padding:8px 0 8px 22px}
+.card-a:hover .tl-card{box-shadow:0 3px 12px rgba(0,0,0,.1);transform:translateY(-1px)}
+
+.tl-card{background:#fff;border-radius:10px;padding:14px 18px;box-shadow:0 1px 3px rgba(0,0,0,.05);border-left:4px solid #ddd;transition:.15s}
+
+.c-head{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.badge{color:#fff;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;flex-shrink:0}
+.artist{padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#1a1a2e;color:#fff;flex-shrink:0}
+.stype{color:#fff;padding:2px 8px;border-radius:8px;font-size:10px;flex-shrink:0}
+
+.c-body{font-size:14px;color:#222;line-height:1.7;margin-bottom:8px}
+
+.c-tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{background:#e8f4fd;color:#1a73e8;padding:3px 10px;border-radius:4px;font-size:11px;cursor:pointer;user-select:all}
+
+.hidden{display:none!important}
+@media(max-width:768px){
+ .side{display:none}.hd{padding:12px}.ct{padding:0 10px 16px}
+ .tl-time{width:56px;min-width:56px}.tl-row::before{left:56px}
+ .date-sep{padding-left:66px}.card-a{padding-left:14px}
+}
+</style>
+</head>
+<body>
+<div class="hd"><div class="hr"><div>
+<h1>📋 纵览新闻 · 文娱选题看板</h1>
+<div class="meta">采集 2026-04-23 11:28 · 38条 · 高12 中23 低3</div>
+</div><div class="hd-right">
+<div class="tf">
+<button class="tb on" data-h="0">全部</button>
+<button class="tb" data-h="6">6h</button>
+<button class="tb" data-h="12">12h</button>
+<button class="tb" data-h="24">24h</button>
+</div>
+<button class="refresh-btn" id="refreshBtn" onclick="doRefresh()"><span class="spin">🔄</span> 刷新采集</button>
+</div></div></div>
+
+<div class="wrap">
+<nav class="side"><button class="sb" data-p="高" style="--c:#ef4444">🔴 高优先级 <span class="sc">12</span></button><button class="sb" data-p="中" style="--c:#f59e0b">🟡 中优先级 <span class="sc">23</span></button><button class="sb" data-p="低" style="--c:#6b7280">⚪ 低优先级 <span class="sc">3</span></button><div class="sdiv"></div><div class="side-date">04月23日 · 今天</div><a href="#c0" class="si"><span class="si-t">11:30</span><span class="si-d" style="background:#6b7280"></span><span class="si-x">郭羡妮</span></a><a href="#c1" class="si"><span class="si-t">11:18</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">檀健次</span></a><a href="#c2" class="si"><span class="si-t">11:18</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">陈慧娴</span></a><a href="#c3" class="si"><span class="si-t">11:09</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">穆祉丞</span></a><a href="#c4" class="si"><span class="si-t">11:02</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">北影节</span></a><a href="#c5" class="si"><span class="si-t">11:00</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">王俊凯</span></a><a href="#c6" class="si"><span class="si-t">11:00</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">谢霆锋</span></a><a href="#c7" class="si"><span class="si-t">10:58</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">QQ音乐</span></a><a href="#c8" class="si"><span class="si-t">10:31</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">张杰</span></a><a href="#c9" class="si"><span class="si-t">10:25</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">张真源</span></a><a href="#c10" class="si"><span class="si-t">10:22</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">李荣浩</span></a><a href="#c11" class="si"><span class="si-t">10:18</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">周深</span></a><a href="#c12" class="si"><span class="si-t">10:17</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">朱志鑫/苏新皓</span></a><a href="#c13" class="si"><span class="si-t">10:04</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">时代少年团</span></a><a href="#c14" class="si"><span class="si-t">10:00</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">迪丽热巴</span></a><a href="#c15" class="si"><span class="si-t">10:00</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">迪丽热巴</span></a><a href="#c16" class="si"><span class="si-t">09:56</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">NONO</span></a><a href="#c17" class="si"><span class="si-t">09:50</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">王大陆</span></a><a href="#c18" class="si"><span class="si-t">09:14</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">田栩宁</span></a><a href="#c19" class="si"><span class="si-t">09:08</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">周震南</span></a><a href="#c20" class="si"><span class="si-t">09:03</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">任嘉伦</span></a><a href="#c21" class="si"><span class="si-t">09:01</span><span class="si-d" style="background:#6b7280"></span><span class="si-x">张凌赫</span></a><a href="#c22" class="si"><span class="si-t">08:26</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">刘宇宁</span></a><a href="#c23" class="si"><span class="si-t">08:11</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">王一博</span></a><a href="#c24" class="si"><span class="si-t">07:30</span><span class="si-d" style="background:#6b7280"></span><span class="si-x">钟汉良</span></a><div class="side-date">04月22日 · 昨天</div><a href="#c25" class="si"><span class="si-t">21:56</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">成毅</span></a><a href="#c26" class="si"><span class="si-t">19:31</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">虞书欣</span></a><a href="#c27" class="si"><span class="si-t">19:03</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">陈丽君</span></a><a href="#c28" class="si"><span class="si-t">18:51</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">周深</span></a><a href="#c29" class="si"><span class="si-t">16:41</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">陈楚生</span></a><a href="#c30" class="si"><span class="si-t">12:38</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">杨紫</span></a><a href="#c31" class="si"><span class="si-t">11:40</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">任嘉伦</span></a><a href="#c32" class="si"><span class="si-t">10:50</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">刘宇宁</span></a><a href="#c33" class="si"><span class="si-t">10:00</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">陈楚生</span></a><a href="#c34" class="si"><span class="si-t">00:14</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">丁禹兮</span></a><div class="side-date">04月21日</div><a href="#c35" class="si"><span class="si-t">21:01</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">虞书欣</span></a><a href="#c36" class="si"><span class="si-t">19:20</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">刘宇宁</span></a><a href="#c37" class="si"><span class="si-t">13:38</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">刘宇宁</span></a></nav>
+<div class="main">
+<div class="bar"><button class="fb active" data-f="all">全部</button><button class="fb" data-f="NONO">NONO</button><button class="fb" data-f="QQ音乐">QQ音乐</button><button class="fb" data-f="丁禹兮">丁禹兮</button><button class="fb" data-f="任嘉伦">任嘉伦</button><button class="fb" data-f="刘宇宁">刘宇宁</button><button class="fb" data-f="北影节">北影节</button><button class="fb" data-f="周深">周深</button><button class="fb" data-f="周震南">周震南</button><button class="fb" data-f="张凌赫">张凌赫</button><button class="fb" data-f="张杰">张杰</button><button class="fb" data-f="张真源">张真源</button><button class="fb" data-f="成毅">成毅</button><button class="fb" data-f="时代少年团">时代少年团</button><button class="fb" data-f="朱志鑫/苏新皓">朱志鑫/苏新皓</button><button class="fb" data-f="李荣浩">李荣浩</button><button class="fb" data-f="杨紫">杨紫</button><button class="fb" data-f="檀健次">檀健次</button><button class="fb" data-f="王一博">王一博</button><button class="fb" data-f="王俊凯">王俊凯</button><button class="fb" data-f="王大陆">王大陆</button><button class="fb" data-f="田栩宁">田栩宁</button><button class="fb" data-f="穆祉丞">穆祉丞</button><button class="fb" data-f="虞书欣">虞书欣</button><button class="fb" data-f="谢霆锋">谢霆锋</button><button class="fb" data-f="迪丽热巴">迪丽热巴</button><button class="fb" data-f="郭羡妮">郭羡妮</button><button class="fb" data-f="钟汉良">钟汉良</button><button class="fb" data-f="陈丽君">陈丽君</button><button class="fb" data-f="陈慧娴">陈慧娴</button><button class="fb" data-f="陈楚生">陈楚生</button></div>
+<div class="ct"><div class="date-sep" data-date="2026-04-23"><span class="date-label">04月23日 · 今天</span></div>
+<div class="tl-row" id="c0" data-p="低" data-a="郭羡妮" data-t="2026-04-23T11:30:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">11:30</span><span class="tl-dot" style="background:#6b7280"></span></div>
+  <a href="https://weibo.com/detail/5290827346870297" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#6b7280">
+    <div class="c-head">
+      <span class="badge" style="background:#6b7280">低</span>
+      <span class="artist">郭羡妮</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">郭羡妮回怼古天乐宣萱CP粉：金像奖上古天乐扶她防摔倒，被CP粉过度解读</div>
+    <div class="c-tags"><span class="tag">#郭羡妮怼CP粉#</span> <span class="tag">#寻秦记重聚引风波#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c1" data-p="中" data-a="檀健次" data-t="2026-04-23T11:18:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">11:18</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290824529347131" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">檀健次</span>
+      <span class="stype" style="background:#7c3aed">圈内教父</span>
+    </div>
+    <div class="c-body">檀健次《宠》获QQ音乐Q1巅峰潮流榜十大单曲，10万+收藏571次上榜</div>
+    <div class="c-tags"><span class="tag">#檀健次宠十大单曲#</span> <span class="tag">#571次上榜10万收藏#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c2" data-p="中" data-a="陈慧娴" data-t="2026-04-23T11:18:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">11:18</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290824327498373" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">陈慧娴</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">陈慧娴成都演唱会6月13日开唱，4月23日11:38全平台开售</div>
+    <div class="c-tags"><span class="tag">#陈慧娴成都站今日开售#</span> <span class="tag">#千千阙歌成都见#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c3" data-p="中" data-a="穆祉丞" data-t="2026-04-23T11:09:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">11:09</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290822216194028" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">穆祉丞</span>
+      <span class="stype" style="background:#7c3aed">圈内教父</span>
+    </div>
+    <div class="c-body">穆祉丞《等待一切重来》获QQ音乐Q1巅峰潮流榜十大单曲，894次上榜66次夺冠</div>
+    <div class="c-tags"><span class="tag">#穆祉丞894次上榜66次夺冠#</span> <span class="tag">#等待一切重来潮流榜十大#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c4" data-p="高" data-a="北影节" data-t="2026-04-23T11:02:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">11:02</span><span class="tl-dot" style="background:#ef4444"></span></div>
+  <a href="https://weibo.com/detail/5290820359684169" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#ef4444">
+    <div class="c-head">
+      <span class="badge" style="background:#ef4444">高</span>
+      <span class="artist">北影节</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">第十六届北影节闭幕式首波阵容官宣：吴京、刘诗诗、周深、段奕宏等亮相</div>
+    <div class="c-tags"><span class="tag">#北影节闭幕式阵容官宣#</span> <span class="tag">#吴京刘诗诗周深齐聚#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c5" data-p="中" data-a="王俊凯" data-t="2026-04-23T11:00:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">11:00</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290820032793394" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">王俊凯</span>
+      <span class="stype" style="background:#7c3aed">圈内教父</span>
+    </div>
+    <div class="c-body">王俊凯获QQ音乐Q1巅峰榜十大艺人，新歌《无人乐园》获十大单曲</div>
+    <div class="c-tags"><span class="tag">#王俊凯无人乐园十大单曲#</span> <span class="tag">#王俊凯Q1双榜上榜#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c6" data-p="中" data-a="谢霆锋" data-t="2026-04-23T11:00:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">11:00</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290819793192648" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">谢霆锋</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">谢霆锋进化演唱会成都站今日二开售票，五一假期连演两场</div>
+    <div class="c-tags"><span class="tag">#谢霆锋成都演唱会今日开票#</span> <span class="tag">#五一谢霆锋成都见#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c7" data-p="中" data-a="QQ音乐" data-t="2026-04-23T10:58:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">10:58</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290817612678371" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">QQ音乐</span>
+      <span class="stype" style="background:#7c3aed">圈内教父</span>
+    </div>
+    <div class="c-body">QQ音乐2026Q1巅峰榜十大艺人揭晓：周杰伦、BTS、周深、刘宇宁、王俊凯等入选</div>
+    <div class="c-tags"><span class="tag">#QQ音乐Q1十大艺人名单#</span> <span class="tag">#华语乐坛Q1成绩单#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c8" data-p="高" data-a="张杰" data-t="2026-04-23T10:31:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">10:31</span><span class="tl-dot" style="background:#ef4444"></span></div>
+  <a href="https://weibo.com/detail/5290812592095623" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#ef4444">
+    <div class="c-head">
+      <span class="badge" style="background:#ef4444">高</span>
+      <span class="artist">张杰</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">张杰鸟巢十六场连开幕后特辑上线，每场结束即复盘拒绝"舞台预制菜"</div>
+    <div class="c-tags"><span class="tag">#张杰鸟巢16场拒绝预制菜#</span> <span class="tag">#鸟巢幕后团队认证高能量#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c9" data-p="高" data-a="张真源" data-t="2026-04-23T10:25:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">10:25</span><span class="tl-dot" style="background:#ef4444"></span></div>
+  <a href="https://weibo.com/detail/5290810989090844" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#ef4444">
+    <div class="c-head">
+      <span class="badge" style="background:#ef4444">高</span>
+      <span class="artist">张真源</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">《奔跑吧14》4月24日开播，张真源激情指挥预告片释出</div>
+    <div class="c-tags"><span class="tag">#奔跑吧14明晚开播#</span> <span class="tag">#张真源跑男首秀#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c10" data-p="中" data-a="李荣浩" data-t="2026-04-23T10:22:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">10:22</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290810258227763" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">李荣浩</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">李荣浩"黑马"世界巡回演唱会官宣大连站，8月8日大连体育中心开唱</div>
+    <div class="c-tags"><span class="tag">#李荣浩黑马巡演官宣大连#</span> <span class="tag">#阔别三年重返大连#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c11" data-p="高" data-a="周深" data-t="2026-04-23T10:18:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">10:18</span><span class="tl-dot" style="background:#ef4444"></span></div>
+  <a href="https://weibo.com/detail/5290809223288607" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#ef4444">
+    <div class="c-head">
+      <span class="badge" style="background:#ef4444">高</span>
+      <span class="artist">周深</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">周深获QQ音乐巅峰榜2026Q1十大艺人，《吉量》《占有Live》分获十大单曲和综艺单曲</div>
+    <div class="c-tags"><span class="tag">#周深Q1巅峰榜十大艺人#</span> <span class="tag">#吉量占有双曲上榜#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c12" data-p="中" data-a="朱志鑫/苏新皓" data-t="2026-04-23T10:17:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">10:17</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290809152242431" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">朱志鑫/苏新皓</span>
+      <span class="stype" style="background:#7c3aed">圈内教父</span>
+    </div>
+    <div class="c-body">登陆少年朱志鑫、苏新皓ELLE五月刊单链接均秒切破5万本，苏新皓第一个售罄</div>
+    <div class="c-tags"><span class="tag">#登陆少年ELLE秒切大捷#</span> <span class="tag">#苏新皓单链第一个售罄#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c13" data-p="中" data-a="时代少年团" data-t="2026-04-23T10:04:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">10:04</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290805751447725" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">时代少年团</span>
+      <span class="stype" style="background:#7c3aed">圈内教父</span>
+    </div>
+    <div class="c-body">时代少年团广州演唱会各家公交站海报应援上刊，广州即将成为"痛城"</div>
+    <div class="c-tags"><span class="tag">#时代少年团广州痛城#</span> <span class="tag">#广州演唱会应援上刊#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c14" data-p="高" data-a="迪丽热巴" data-t="2026-04-23T10:00:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">10:00</span><span class="tl-dot" style="background:#ef4444"></span></div>
+  <a href="https://weibo.com/detail/5290804697368421" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#ef4444">
+    <div class="c-head">
+      <span class="badge" style="background:#ef4444">高</span>
+      <span class="artist">迪丽热巴</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">《白日提灯》今日收官，迪丽热巴陈飞宇领衔，腾讯视频独播</div>
+    <div class="c-tags"><span class="tag">#白日提灯今日收官#</span> <span class="tag">#迪丽热巴古偶再交卷#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c15" data-p="中" data-a="迪丽热巴" data-t="2026-04-23T10:00:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">10:00</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290804706807485" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">迪丽热巴</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">迪丽热巴工作室发维权声明，就AI换脸侵权及诽谤言论启动诉讼</div>
+    <div class="c-tags"><span class="tag">#迪丽热巴起诉AI换脸侵权#</span> <span class="tag">#AI换脸维权第一案#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c16" data-p="中" data-a="NONO" data-t="2026-04-23T09:56:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">09:56</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290803875546654" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">NONO</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">台湾艺人NONO性侵案二审宣判，维持一审有期徒刑2年6个月，上诉驳回</div>
+    <div class="c-tags"><span class="tag">#NONO性侵案二审败诉#</span> <span class="tag">#二审维持原判#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c17" data-p="中" data-a="王大陆" data-t="2026-04-23T09:50:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">09:50</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290802354061922" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">王大陆</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">王大陆方律师发声明称将提起上诉，认为有罪判决存在事实与法律偏差</div>
+    <div class="c-tags"><span class="tag">#王大陆将上诉#</span> <span class="tag">#王大陆方律师声明#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c18" data-p="高" data-a="田栩宁" data-t="2026-04-23T09:14:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">09:14</span><span class="tl-dot" style="background:#ef4444"></span></div>
+  <a href="https://weibo.com/detail/5290793298560736" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#ef4444">
+    <div class="c-head">
+      <span class="badge" style="background:#ef4444">高</span>
+      <span class="artist">田栩宁</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">华策影视年报披露：田栩宁相关经纪业务营收同比增长55%，音乐业务增长99%近乎翻倍</div>
+    <div class="c-tags"><span class="tag">#田栩宁一人撑起华策增长#</span> <span class="tag">#经纪音乐双板块暴涨#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c19" data-p="中" data-a="周震南" data-t="2026-04-23T09:08:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">09:08</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290791750338619" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">周震南</span>
+      <span class="stype" style="background:#7c3aed">圈内教父</span>
+    </div>
+    <div class="c-body">周震南"Love&Desire"演唱会斩获2026缪斯设计奖铂金奖，舞台设计获国际认可</div>
+    <div class="c-tags"><span class="tag">#周震南演唱会获缪斯铂金奖#</span> <span class="tag">#中国舞台设计国际获奖#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c20" data-p="中" data-a="任嘉伦" data-t="2026-04-23T09:03:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">09:03</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290790949751423" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">任嘉伦</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">任嘉伦五一音乐节演出歌单公布，5月1日和4日两场表演含新歌YOLO</div>
+    <div class="c-tags"><span class="tag">#任嘉伦五一音乐节歌单#</span> <span class="tag">#任嘉伦YOLO舞台#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c21" data-p="低" data-a="张凌赫" data-t="2026-04-23T09:01:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">09:01</span><span class="tl-dot" style="background:#6b7280"></span></div>
+  <a href="https://weibo.com/detail/5290789923983215" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#6b7280">
+    <div class="c-head">
+      <span class="badge" style="background:#6b7280">低</span>
+      <span class="artist">张凌赫</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">张凌赫再次帮粉丝修图，直接调整构图和色调引热议</div>
+    <div class="c-tags"><span class="tag">#张凌赫帮粉丝修图#</span> <span class="tag">#摄影师张凌赫又上线#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c22" data-p="中" data-a="刘宇宁" data-t="2026-04-23T08:26:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">08:26</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290781280568561" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">刘宇宁</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">刘宇宁宋祖儿恋情传闻再发酵，网友扒出疑似同款地板家具引热议</div>
+    <div class="c-tags"><span class="tag">#刘宇宁宋祖儿同款家具#</span> <span class="tag">#恋情瓜又来了#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c23" data-p="中" data-a="王一博" data-t="2026-04-23T08:11:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">08:11</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290777439371376" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">王一博</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">青年报报道：赛车赛事十年来首次售罄，最高票价5880元，因王一博参赛带动观赛热潮</div>
+    <div class="c-tags"><span class="tag">#王一博带火赛车十年首次售罄#</span> <span class="tag">#最高票价5880元#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c24" data-p="低" data-a="钟汉良" data-t="2026-04-23T07:30:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">07:30</span><span class="tl-dot" style="background:#6b7280"></span></div>
+  <a href="https://weibo.com/detail/5290766949941599" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#6b7280">
+    <div class="c-head">
+      <span class="badge" style="background:#6b7280">低</span>
+      <span class="artist">钟汉良</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">《蜜语纪》钟汉良朱珠雨夜吻戏片段热传，中偶版"摔倒就接吻"</div>
+    <div class="c-tags"><span class="tag">#蜜语纪雨夜吻戏#</span> <span class="tag">#中偶摔倒就接吻#</span></div>
+  </div>
+  </a>
+</div><div class="date-sep" data-date="2026-04-22"><span class="date-label">04月22日 · 昨天</span></div>
+<div class="tl-row" id="c25" data-p="高" data-a="成毅" data-t="2026-04-22T21:56:00" data-d="2026-04-22">
+  <div class="tl-time"><span class="hm">21:56</span><span class="tl-dot" style="background:#ef4444"></span></div>
+  <a href="https://weibo.com/detail/5290622739029014" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#ef4444">
+    <div class="c-head">
+      <span class="badge" style="background:#ef4444">高</span>
+      <span class="artist">成毅</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">曝成毅1月已与欢瑞合约到期，成立个人工作室独立发展</div>
+    <div class="c-tags"><span class="tag">#成毅告别欢瑞#</span> <span class="tag">#成毅成立个人工作室#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c26" data-p="中" data-a="虞书欣" data-t="2026-04-22T19:31:00" data-d="2026-04-22">
+  <div class="tl-time"><span class="hm">19:31</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290586153683157" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">虞书欣</span>
+      <span class="stype" style="background:#2563eb">本人</span>
+    </div>
+    <div class="c-body">虞书欣亮相戛纳WAIFF世界人工智能电影节，多套造型引热议</div>
+    <div class="c-tags"><span class="tag">#虞书欣戛纳亮相#</span> <span class="tag">#虞书欣蓝色妖姬造型#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c27" data-p="中" data-a="陈丽君" data-t="2026-04-22T19:03:00" data-d="2026-04-22">
+  <div class="tl-time"><span class="hm">19:03</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290578994006037" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">陈丽君</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">陈丽君领衔话剧《枕头人》12周年版4月25日成都站开演，倒计时3天</div>
+    <div class="c-tags"><span class="tag">#陈丽君枕头人成都站#</span> <span class="tag">#话剧枕头人12周年#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c28" data-p="中" data-a="周深" data-t="2026-04-22T18:51:00" data-d="2026-04-22">
+  <div class="tl-time"><span class="hm">18:51</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290576010544176" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">周深</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">香港金牌编曲人杜自持公开表示最想合作的歌手是周深，期待为其编粤语作品</div>
+    <div class="c-tags"><span class="tag">#杜自持最想合作周深#</span> <span class="tag">#周深粤语歌要来了#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c29" data-p="高" data-a="陈楚生" data-t="2026-04-22T16:41:00" data-d="2026-04-22">
+  <div class="tl-time"><span class="hm">16:41</span><span class="tl-dot" style="background:#ef4444"></span></div>
+  <a href="https://weibo.com/detail/5290543397470565" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#ef4444">
+    <div class="c-head">
+      <span class="badge" style="background:#ef4444">高</span>
+      <span class="artist">陈楚生</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">陈楚生荒芜之境巡演广州站加场，5月16-17日两晚连唱，4月23日预售</div>
+    <div class="c-tags"><span class="tag">#陈楚生广州加场明天预售#</span> <span class="tag">#荒芜之境体育场巡演#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c30" data-p="高" data-a="杨紫" data-t="2026-04-22T12:38:00" data-d="2026-04-22">
+  <div class="tl-time"><span class="hm">12:38</span><span class="tl-dot" style="background:#ef4444"></span></div>
+  <a href="https://weibo.com/detail/5290482231938496" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#ef4444">
+    <div class="c-head">
+      <span class="badge" style="background:#ef4444">高</span>
+      <span class="artist">杨紫</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">华策财报披露《国色芳华》营收近7亿，会员拉新1200万广告招商3.2亿</div>
+    <div class="c-tags"><span class="tag">#国色芳华营收近7亿#</span> <span class="tag">#杨紫剧王含金量#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c31" data-p="中" data-a="任嘉伦" data-t="2026-04-22T11:40:00" data-d="2026-04-22">
+  <div class="tl-time"><span class="hm">11:40</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290467585687708" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">任嘉伦</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">任嘉伦个人艺术中心在青岛百年建筑红房子正式启幕，设舞蹈室音乐空间等</div>
+    <div class="c-tags"><span class="tag">#任嘉伦青岛红房子开幕#</span> <span class="tag">#艺人自建艺术中心#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c32" data-p="高" data-a="刘宇宁" data-t="2026-04-22T10:50:00" data-d="2026-04-22">
+  <div class="tl-time"><span class="hm">10:50</span><span class="tl-dot" style="background:#ef4444"></span></div>
+  <a href="https://weibo.com/detail/5290454937768698" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#ef4444">
+    <div class="c-head">
+      <span class="badge" style="background:#ef4444">高</span>
+      <span class="artist">刘宇宁</span>
+      <span class="stype" style="background:#2563eb">本人</span>
+    </div>
+    <div class="c-body">刘宇宁献唱《佳偶天成》OST《生当何为》上线，4月25日开播</div>
+    <div class="c-tags"><span class="tag">#佳偶天成4月25日开播#</span> <span class="tag">#刘宇宁唱佳偶天成OST#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c33" data-p="中" data-a="陈楚生" data-t="2026-04-22T10:00:00" data-d="2026-04-22">
+  <div class="tl-time"><span class="hm">10:00</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290442532062009" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">陈楚生</span>
+      <span class="stype" style="background:#2563eb">本人</span>
+    </div>
+    <div class="c-body">陈楚生荒芜之境巡演上海站回顾视频发布，体育场巡演持续火热</div>
+    <div class="c-tags"><span class="tag">#陈楚生上海站回顾#</span> <span class="tag">#荒芜之境巡演继续#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c34" data-p="高" data-a="丁禹兮" data-t="2026-04-22T00:14:00" data-d="2026-04-22">
+  <div class="tl-time"><span class="hm">00:14</span><span class="tl-dot" style="background:#ef4444"></span></div>
+  <a href="https://weibo.com/detail/5290295042507763" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#ef4444">
+    <div class="c-head">
+      <span class="badge" style="background:#ef4444">高</span>
+      <span class="artist">丁禹兮</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">光线传媒2025财报：丁禹兮《山河枕》为光线影视收入第二，仅次于《哪吒》</div>
+    <div class="c-tags"><span class="tag">#山河枕光线收入仅次哪吒#</span> <span class="tag">#丁禹兮影视回报率惊人#</span></div>
+  </div>
+  </a>
+</div><div class="date-sep" data-date="2026-04-21"><span class="date-label">04月21日</span></div>
+<div class="tl-row" id="c35" data-p="中" data-a="虞书欣" data-t="2026-04-21T21:01:00" data-d="2026-04-21">
+  <div class="tl-time"><span class="hm">21:01</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290246415845522" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">虞书欣</span>
+      <span class="stype" style="background:#2563eb">本人</span>
+    </div>
+    <div class="c-body">虞书欣发布春日限定单曲《最是人间留不住》</div>
+    <div class="c-tags"><span class="tag">#虞书欣春日新歌上线#</span> <span class="tag">#最是人间留不住#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c36" data-p="高" data-a="刘宇宁" data-t="2026-04-21T19:20:00" data-d="2026-04-21">
+  <div class="tl-time"><span class="hm">19:20</span><span class="tl-dot" style="background:#ef4444"></span></div>
+  <a href="https://weibo.com/detail/5290221014091979" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#ef4444">
+    <div class="c-head">
+      <span class="badge" style="background:#ef4444">高</span>
+      <span class="artist">刘宇宁</span>
+      <span class="stype" style="background:#2563eb">本人</span>
+    </div>
+    <div class="c-body">刘宇宁2025巡演正式收官，9个月9城16场76首歌</div>
+    <div class="c-tags"><span class="tag">#刘宇宁巡演收官#</span> <span class="tag">#9城16场圆满落幕#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c37" data-p="中" data-a="刘宇宁" data-t="2026-04-21T13:38:00" data-d="2026-04-21">
+  <div class="tl-time"><span class="hm">13:38</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290134845262614" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">刘宇宁</span>
+      <span class="stype" style="background:#2563eb">本人</span>
+    </div>
+    <div class="c-body">刘宇宁献唱电影《寻龙诀觅踪》主题曲《天星术》，录制五年终上线</div>
+    <div class="c-tags"><span class="tag">#寻龙诀觅踪主题曲上线#</span> <span class="tag">#刘宇宁天星术等了五年#</span></div>
+  </div>
+  </a>
+</div></div>
+</div></div>
+
+<script>
+(function(){
+var cA='all',cH=0,cP='all';
+var ft=new Date('2026-04-23T11:28:00');
+function run(){
+ document.querySelectorAll('.tl-row').forEach(function(el){
+  var ok=true;
+  if(cA!=='all'&&el.dataset.a!==cA)ok=false;
+  if(cP!=='all'&&el.dataset.p!==cP)ok=false;
+  if(cH>0){var d=new Date(el.dataset.t);if((ft-d)/36e5>cH)ok=false;}
+  el.classList.toggle('hidden',!ok);
+ });
+ document.querySelectorAll('.date-sep').forEach(function(sep){
+  var d=sep.dataset.date;var vis=0;
+  document.querySelectorAll('.tl-row[data-d="'+d+'"]').forEach(function(r){if(!r.classList.contains('hidden'))vis++});
+  sep.classList.toggle('hidden',vis===0);
+ });
+}
+document.querySelectorAll('.fb[data-f]').forEach(function(b){
+ b.onclick=function(){document.querySelectorAll('.fb').forEach(function(x){x.classList.remove('active')});b.classList.add('active');cA=b.dataset.f;run();};
+});
+document.querySelectorAll('.tb[data-h]').forEach(function(b){
+ b.onclick=function(){document.querySelectorAll('.tb').forEach(function(x){x.classList.remove('on')});b.classList.add('on');cH=+b.dataset.h;run();};
+});
+document.querySelectorAll('.sb').forEach(function(b){
+ b.onclick=function(){
+  var p=b.dataset.p;
+  if(cP===p){cP='all';document.querySelectorAll('.sb').forEach(function(x){x.classList.remove('on')});}
+  else{cP=p;document.querySelectorAll('.sb').forEach(function(x){x.classList.remove('on')});b.classList.add('on');}
+  run();
+ };
+});
+document.querySelectorAll('.si').forEach(function(a){
+ a.onclick=function(e){e.preventDefault();var t=document.getElementById(a.getAttribute('href').substring(1));if(t)t.scrollIntoView({behavior:'smooth',block:'start'});};
+});
+})();
+
+function doRefresh(){
+ var btn=document.getElementById('refreshBtn');
+ btn.classList.add('loading');
+ btn.querySelector('.spin').textContent='⏳';
+ fetch('/refresh',{method:'POST'})
+ .then(function(r){return r.json()})
+ .then(function(d){
+  if(d.ok){window.location.reload();}
+  else{alert('采集失败: '+(d.error||''));btn.classList.remove('loading');btn.querySelector('.spin').textContent='🔄';};
+ })
+ .catch(function(e){
+  alert('请先启动服务：python3 server.py');
+  btn.classList.remove('loading');btn.querySelector('.spin').textContent='🔄';
+ });
+}
+</script>
+</body></html>
