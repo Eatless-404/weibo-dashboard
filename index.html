@@ -25,6 +25,22 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 
 .wrap{display:flex;min-height:calc(100vh - 56px)}
 
+/* 右栏：实时信号 */
+.live{width:280px;min-width:280px;background:#fff;border-left:1px solid #e5e5e5;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;padding:0;flex-shrink:0}
+.live-hd{padding:12px 14px 8px;border-bottom:1px solid #eee;position:sticky;top:0;background:#fff;z-index:2}
+.live-hd h3{font-size:13px;display:flex;align-items:center;gap:6px}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.live-meta{font-size:10px;color:#aaa;margin-top:2px}
+.live-feed{padding:0}
+.live-item{padding:10px 14px;border-bottom:1px solid #f0f0f0;text-decoration:none;display:block;color:inherit;transition:.1s}
+.live-item:hover{background:#f8f8f8}
+.live-time{font-size:10px;color:#aaa;font-variant-numeric:tabular-nums}
+.live-who{font-size:12px;font-weight:600;margin:2px 0}
+.live-src{font-size:10px;color:#888;margin-bottom:2px}
+.live-txt{font-size:12px;color:#444;line-height:1.5}
+.live-empty{padding:10px 14px;font-size:11px;color:#ccc;border-bottom:1px solid #f5f5f5}
+
 .side{width:200px;min-width:200px;background:#fff;border-right:1px solid #e5e5e5;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;padding:10px 0;flex-shrink:0}
 .sb{display:flex;align-items:center;gap:5px;width:100%;padding:7px 12px;font-size:12px;font-weight:600;color:#333;background:0;border:none;border-left:3px solid var(--c);cursor:pointer;text-align:left}
 .sb:hover,.sb.on{background:color-mix(in srgb,var(--c) 10%,white)}
@@ -70,6 +86,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 .tag{background:#e8f4fd;color:#1a73e8;padding:3px 10px;border-radius:4px;font-size:11px;cursor:pointer;user-select:all}
 
 .hidden{display:none!important}
+@media(max-width:1024px){.live{display:none}}
 @media(max-width:768px){
  .side{display:none}.hd{padding:12px}.ct{padding:0 10px 16px}
  .tl-time{width:56px;min-width:56px}.tl-row::before{left:56px}
@@ -628,7 +645,17 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
   </div>
   </a>
 </div></div>
-</div></div>
+</div>
+<aside class="live">
+<div class="live-hd">
+<h3><span class="live-dot"></span> 实时信号</h3>
+<div class="live-meta">每15分钟轮询 · <span id="liveTime">加载中</span></div>
+</div>
+<div class="live-feed" id="liveFeed">
+<div class="live-empty">等待加载信号数据...</div>
+</div>
+</aside>
+</div>
 
 <script>
 (function(){
@@ -666,6 +693,35 @@ document.querySelectorAll('.si').forEach(function(a){
  a.onclick=function(e){e.preventDefault();var t=document.getElementById(a.getAttribute('href').substring(1));if(t)t.scrollIntoView({behavior:'smooth',block:'start'});};
 });
 })();
+
+// 实时信号加载
+function loadSignals(){
+ fetch('signals.json?t='+Date.now())
+ .then(function(r){if(!r.ok)throw 0;return r.json()})
+ .then(function(d){
+  var feed=document.getElementById('liveFeed');
+  var timeEl=document.getElementById('liveTime');
+  if(d.last_check)timeEl.textContent=d.last_check;
+  var items=d.signals||[];
+  if(!items.length){feed.innerHTML='<div class="live-empty">暂无新信号</div>';return;}
+  var html='';
+  items.forEach(function(s){
+   var link=s.link||'#';
+   html+='<a href="'+link+'" target="_blank" class="live-item">';
+   html+='<div class="live-time">'+s.time+'</div>';
+   html+='<div class="live-who">🔔 '+s.artist+'</div>';
+   html+='<div class="live-src">'+s.source+'</div>';
+   html+='<div class="live-txt">'+s.text+'</div>';
+   html+='</a>';
+  });
+  feed.innerHTML=html;
+ })
+ .catch(function(){
+  document.getElementById('liveFeed').innerHTML='<div class="live-empty">信号数据暂不可用</div>';
+ });
+}
+loadSignals();
+setInterval(loadSignals,60000);
 
 function doRefresh(){
  var btn=document.getElementById('refreshBtn');
