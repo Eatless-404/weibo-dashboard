@@ -54,7 +54,11 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 .si-x{overflow:hidden;text-overflow:ellipsis}
 
 .main{flex:1;min-width:0}
-.bar{background:#fff;padding:8px 20px;border-bottom:1px solid #e5e5e5;position:sticky;top:56px;z-index:99;display:flex;gap:5px;flex-wrap:wrap}
+.bar{background:#fff;padding:8px 20px;border-bottom:1px solid #e5e5e5;position:sticky;top:56px;z-index:99}
+.bar-toggle{display:none;font-size:12px;font-weight:600;color:#666;cursor:pointer;padding:4px 0}
+.bar-content{display:flex;gap:5px;flex-wrap:wrap}
+.mobile-only{display:none}
+.toggle{cursor:pointer}
 .fb{padding:3px 10px;border:1px solid #ddd;border-radius:14px;background:#fff;font-size:11px;cursor:pointer;transition:.2s}
 .fb:hover{border-color:#666} .fb.active{background:#1a1a2e;color:#fff;border-color:#1a1a2e}
 
@@ -89,8 +93,13 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 @media(max-width:1024px){
  .wrap{flex-direction:column}
  .side{display:none}
- .live{width:100%;min-width:0;height:auto;max-height:400px;position:relative;top:0;border-left:none;border-top:2px solid #1a1a2e;order:1}
+ .live{width:100%;min-width:0;height:auto;max-height:none;position:relative;top:0;border-left:none;border-top:2px solid #1a1a2e;order:1}
+ .live-feed{display:none}
+ .live-hd{cursor:pointer}
+ .mobile-only{display:inline}
  .main{order:2}
+ .bar-toggle{display:block}
+ .bar-content{display:none}
 }
 @media(max-width:768px){
  .side{display:none}.hd{padding:12px}.ct{padding:0 10px 16px}
@@ -102,15 +111,18 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 <body>
 <div class="hd"><div class="hr"><div>
 <h1>📋 纵览新闻 · 文娱选题看板</h1>
-<div class="meta">采集 2026-04-23 15:17 · 59条 · 高22 中33 低4</div>
+<div class="meta">采集 2026-04-23 15:21 · 59条 · 高19 中36 低4</div>
 </div><div class="hd-right">
 <button class="refresh-btn" id="refreshBtn" onclick="doRefresh()"><span class="spin">🔄</span> 刷新采集</button>
 </div></div></div>
 
 <div class="wrap">
-<nav class="side"><button class="sb" data-p="高" style="--c:#ef4444">🔴 高优先级 <span class="sc">22</span></button><button class="sb" data-p="中" style="--c:#f59e0b">🟡 中优先级 <span class="sc">33</span></button><button class="sb" data-p="低" style="--c:#6b7280">⚪ 低优先级 <span class="sc">4</span></button><div class="sdiv"></div><div class="side-date">04月23日 · 今天</div><a href="#c0" class="si"><span class="si-t">15:15</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">成毅</span></a><a href="#c1" class="si"><span class="si-t">14:28</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">丁程鑫</span></a><a href="#c2" class="si"><span class="si-t">14:11</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">刘宇</span></a><a href="#c3" class="si"><span class="si-t">13:35</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">李荣浩</span></a><a href="#c4" class="si"><span class="si-t">13:20</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">刘宇宁</span></a><a href="#c5" class="si"><span class="si-t">13:20</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">陈楚生</span></a><a href="#c6" class="si"><span class="si-t">13:16</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">迪丽热巴</span></a><a href="#c7" class="si"><span class="si-t">13:08</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">刘宇宁</span></a><a href="#c8" class="si"><span class="si-t">12:47</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">陈楚生</span></a><a href="#c9" class="si"><span class="si-t">12:44</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">周深</span></a><a href="#c10" class="si"><span class="si-t">12:34</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">周深</span></a><a href="#c11" class="si"><span class="si-t">12:10</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">刘宇宁</span></a><a href="#c12" class="si"><span class="si-t">12:08</span><span class="si-d" style="background:#6b7280"></span><span class="si-x">王一博</span></a><a href="#c13" class="si"><span class="si-t">12:06</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">周深</span></a><a href="#c14" class="si"><span class="si-t">12:00</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">任嘉伦</span></a><a href="#c15" class="si"><span class="si-t">11:40</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">陈丽君</span></a><a href="#c16" class="si"><span class="si-t">11:30</span><span class="si-d" style="background:#6b7280"></span><span class="si-x">郭羡妮</span></a><a href="#c17" class="si"><span class="si-t">11:25</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">张真源</span></a><a href="#c18" class="si"><span class="si-t">11:25</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">张真源</span></a><a href="#c19" class="si"><span class="si-t">11:18</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">檀健次</span></a><a href="#c20" class="si"><span class="si-t">11:18</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">陈慧娴</span></a><a href="#c21" class="si"><span class="si-t">11:09</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">穆祉丞</span></a><a href="#c22" class="si"><span class="si-t">11:02</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">北影节</span></a><a href="#c23" class="si"><span class="si-t">11:00</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">王俊凯</span></a><a href="#c24" class="si"><span class="si-t">11:00</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">谢霆锋</span></a><a href="#c25" class="si"><span class="si-t">10:58</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">马嘉祺</span></a><a href="#c26" class="si"><span class="si-t">10:51</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">刘宇宁</span></a><a href="#c27" class="si"><span class="si-t">10:31</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">张杰</span></a><a href="#c28" class="si"><span class="si-t">10:29</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">周深</span></a><a href="#c29" class="si"><span class="si-t">10:25</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">张真源</span></a><a href="#c30" class="si"><span class="si-t">10:22</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">李荣浩</span></a><a href="#c31" class="si"><span class="si-t">10:18</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">田栩宁</span></a><a href="#c32" class="si"><span class="si-t">10:18</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">周深</span></a><a href="#c33" class="si"><span class="si-t">10:17</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">朱志鑫/苏新皓</span></a><a href="#c34" class="si"><span class="si-t">10:04</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">张真源</span></a><a href="#c35" class="si"><span class="si-t">10:00</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">迪丽热巴</span></a><a href="#c36" class="si"><span class="si-t">10:00</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">迪丽热巴</span></a><a href="#c37" class="si"><span class="si-t">09:56</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">NONO</span></a><a href="#c38" class="si"><span class="si-t">09:50</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">王大陆</span></a><a href="#c39" class="si"><span class="si-t">09:14</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">田栩宁</span></a><a href="#c40" class="si"><span class="si-t">09:08</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">周震南</span></a><a href="#c41" class="si"><span class="si-t">09:03</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">任嘉伦</span></a><a href="#c42" class="si"><span class="si-t">09:01</span><span class="si-d" style="background:#6b7280"></span><span class="si-x">张凌赫</span></a><a href="#c43" class="si"><span class="si-t">08:26</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">刘宇宁</span></a><a href="#c44" class="si"><span class="si-t">08:11</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">王一博</span></a><a href="#c45" class="si"><span class="si-t">07:30</span><span class="si-d" style="background:#6b7280"></span><span class="si-x">钟汉良</span></a><div class="side-date">04月22日 · 昨天</div><a href="#c46" class="si"><span class="si-t">21:56</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">成毅</span></a><a href="#c47" class="si"><span class="si-t">19:31</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">虞书欣</span></a><a href="#c48" class="si"><span class="si-t">19:03</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">陈丽君</span></a><a href="#c49" class="si"><span class="si-t">18:51</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">周深</span></a><a href="#c50" class="si"><span class="si-t">16:41</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">陈楚生</span></a><a href="#c51" class="si"><span class="si-t">12:38</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">杨紫</span></a><a href="#c52" class="si"><span class="si-t">11:40</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">任嘉伦</span></a><a href="#c53" class="si"><span class="si-t">10:50</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">刘宇宁</span></a><a href="#c54" class="si"><span class="si-t">10:00</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">陈楚生</span></a><a href="#c55" class="si"><span class="si-t">00:14</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">丁禹兮</span></a><div class="side-date">04月21日</div><a href="#c56" class="si"><span class="si-t">21:01</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">虞书欣</span></a><a href="#c57" class="si"><span class="si-t">19:20</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">刘宇宁</span></a><a href="#c58" class="si"><span class="si-t">13:38</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">刘宇宁</span></a></nav>
+<nav class="side"><button class="sb" data-p="高" style="--c:#ef4444">🔴 高优先级 <span class="sc">19</span></button><button class="sb" data-p="中" style="--c:#f59e0b">🟡 中优先级 <span class="sc">36</span></button><button class="sb" data-p="低" style="--c:#6b7280">⚪ 低优先级 <span class="sc">4</span></button><div class="sdiv"></div><div class="side-date">04月23日 · 今天</div><a href="#c0" class="si"><span class="si-t">15:15</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">成毅</span></a><a href="#c1" class="si"><span class="si-t">14:28</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">丁程鑫</span></a><a href="#c2" class="si"><span class="si-t">14:11</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">刘宇</span></a><a href="#c3" class="si"><span class="si-t">13:35</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">李荣浩</span></a><a href="#c4" class="si"><span class="si-t">13:20</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">刘宇宁</span></a><a href="#c5" class="si"><span class="si-t">13:20</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">陈楚生</span></a><a href="#c6" class="si"><span class="si-t">13:20</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">刘宇宁</span></a><a href="#c7" class="si"><span class="si-t">13:15</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">迪丽热巴</span></a><a href="#c8" class="si"><span class="si-t">12:47</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">陈楚生</span></a><a href="#c9" class="si"><span class="si-t">12:44</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">周深</span></a><a href="#c10" class="si"><span class="si-t">12:34</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">周深</span></a><a href="#c11" class="si"><span class="si-t">12:10</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">刘宇宁</span></a><a href="#c12" class="si"><span class="si-t">12:08</span><span class="si-d" style="background:#6b7280"></span><span class="si-x">王一博</span></a><a href="#c13" class="si"><span class="si-t">12:06</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">周深</span></a><a href="#c14" class="si"><span class="si-t">12:00</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">任嘉伦</span></a><a href="#c15" class="si"><span class="si-t">11:40</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">陈丽君</span></a><a href="#c16" class="si"><span class="si-t">11:30</span><span class="si-d" style="background:#6b7280"></span><span class="si-x">郭羡妮</span></a><a href="#c17" class="si"><span class="si-t">11:25</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">张真源</span></a><a href="#c18" class="si"><span class="si-t">11:25</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">张真源</span></a><a href="#c19" class="si"><span class="si-t">11:18</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">檀健次</span></a><a href="#c20" class="si"><span class="si-t">11:18</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">陈慧娴</span></a><a href="#c21" class="si"><span class="si-t">11:09</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">穆祉丞</span></a><a href="#c22" class="si"><span class="si-t">11:02</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">北影节</span></a><a href="#c23" class="si"><span class="si-t">11:00</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">王俊凯</span></a><a href="#c24" class="si"><span class="si-t">11:00</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">谢霆锋</span></a><a href="#c25" class="si"><span class="si-t">10:58</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">马嘉祺</span></a><a href="#c26" class="si"><span class="si-t">10:51</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">刘宇宁</span></a><a href="#c27" class="si"><span class="si-t">10:31</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">张杰</span></a><a href="#c28" class="si"><span class="si-t">10:29</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">周深</span></a><a href="#c29" class="si"><span class="si-t">10:25</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">张真源</span></a><a href="#c30" class="si"><span class="si-t">10:22</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">李荣浩</span></a><a href="#c31" class="si"><span class="si-t">10:18</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">田栩宁</span></a><a href="#c32" class="si"><span class="si-t">10:18</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">周深</span></a><a href="#c33" class="si"><span class="si-t">10:17</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">朱志鑫/苏新皓</span></a><a href="#c34" class="si"><span class="si-t">10:04</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">张真源</span></a><a href="#c35" class="si"><span class="si-t">10:00</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">迪丽热巴</span></a><a href="#c36" class="si"><span class="si-t">10:00</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">迪丽热巴</span></a><a href="#c37" class="si"><span class="si-t">09:56</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">NONO</span></a><a href="#c38" class="si"><span class="si-t">09:50</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">王大陆</span></a><a href="#c39" class="si"><span class="si-t">09:14</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">田栩宁</span></a><a href="#c40" class="si"><span class="si-t">09:08</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">周震南</span></a><a href="#c41" class="si"><span class="si-t">09:03</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">任嘉伦</span></a><a href="#c42" class="si"><span class="si-t">09:01</span><span class="si-d" style="background:#6b7280"></span><span class="si-x">张凌赫</span></a><a href="#c43" class="si"><span class="si-t">08:26</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">刘宇宁</span></a><a href="#c44" class="si"><span class="si-t">08:11</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">王一博</span></a><a href="#c45" class="si"><span class="si-t">07:30</span><span class="si-d" style="background:#6b7280"></span><span class="si-x">钟汉良</span></a><div class="side-date">04月22日 · 昨天</div><a href="#c46" class="si"><span class="si-t">21:56</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">成毅</span></a><a href="#c47" class="si"><span class="si-t">19:31</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">虞书欣</span></a><a href="#c48" class="si"><span class="si-t">19:03</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">陈丽君</span></a><a href="#c49" class="si"><span class="si-t">18:51</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">周深</span></a><a href="#c50" class="si"><span class="si-t">16:41</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">陈楚生</span></a><a href="#c51" class="si"><span class="si-t">12:38</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">杨紫</span></a><a href="#c52" class="si"><span class="si-t">11:40</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">任嘉伦</span></a><a href="#c53" class="si"><span class="si-t">10:50</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">刘宇宁</span></a><a href="#c54" class="si"><span class="si-t">10:00</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">陈楚生</span></a><a href="#c55" class="si"><span class="si-t">00:14</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">丁禹兮</span></a><div class="side-date">04月21日</div><a href="#c56" class="si"><span class="si-t">21:01</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">虞书欣</span></a><a href="#c57" class="si"><span class="si-t">19:20</span><span class="si-d" style="background:#ef4444"></span><span class="si-x">刘宇宁</span></a><a href="#c58" class="si"><span class="si-t">13:38</span><span class="si-d" style="background:#f59e0b"></span><span class="si-x">刘宇宁</span></a></nav>
 <div class="main">
-<div class="bar"><button class="fb active" data-f="all">全部</button><button class="fb" data-f="NONO">NONO</button><button class="fb" data-f="丁禹兮">丁禹兮</button><button class="fb" data-f="丁程鑫">丁程鑫</button><button class="fb" data-f="任嘉伦">任嘉伦</button><button class="fb" data-f="刘宇">刘宇</button><button class="fb" data-f="刘宇宁">刘宇宁</button><button class="fb" data-f="北影节">北影节</button><button class="fb" data-f="周深">周深</button><button class="fb" data-f="周震南">周震南</button><button class="fb" data-f="张凌赫">张凌赫</button><button class="fb" data-f="张杰">张杰</button><button class="fb" data-f="张真源">张真源</button><button class="fb" data-f="成毅">成毅</button><button class="fb" data-f="朱志鑫/苏新皓">朱志鑫/苏新皓</button><button class="fb" data-f="李荣浩">李荣浩</button><button class="fb" data-f="杨紫">杨紫</button><button class="fb" data-f="檀健次">檀健次</button><button class="fb" data-f="王一博">王一博</button><button class="fb" data-f="王俊凯">王俊凯</button><button class="fb" data-f="王大陆">王大陆</button><button class="fb" data-f="田栩宁">田栩宁</button><button class="fb" data-f="穆祉丞">穆祉丞</button><button class="fb" data-f="虞书欣">虞书欣</button><button class="fb" data-f="谢霆锋">谢霆锋</button><button class="fb" data-f="迪丽热巴">迪丽热巴</button><button class="fb" data-f="郭羡妮">郭羡妮</button><button class="fb" data-f="钟汉良">钟汉良</button><button class="fb" data-f="陈丽君">陈丽君</button><button class="fb" data-f="陈慧娴">陈慧娴</button><button class="fb" data-f="陈楚生">陈楚生</button><button class="fb" data-f="马嘉祺">马嘉祺</button></div>
+<div class="bar">
+<div class="bar-toggle" onclick="var b=document.getElementById('barContent');b.style.display=b.style.display==='none'?'flex':'none';this.querySelector('.toggle').textContent=b.style.display==='none'?'▶ 艺人筛选':'▼ 艺人筛选'"><span class="toggle">▼ 艺人筛选</span></div>
+<div class="bar-content" id="barContent"><button class="fb active" data-f="all">全部</button><button class="fb" data-f="NONO">NONO</button><button class="fb" data-f="丁禹兮">丁禹兮</button><button class="fb" data-f="丁程鑫">丁程鑫</button><button class="fb" data-f="任嘉伦">任嘉伦</button><button class="fb" data-f="刘宇">刘宇</button><button class="fb" data-f="刘宇宁">刘宇宁</button><button class="fb" data-f="北影节">北影节</button><button class="fb" data-f="周深">周深</button><button class="fb" data-f="周震南">周震南</button><button class="fb" data-f="张凌赫">张凌赫</button><button class="fb" data-f="张杰">张杰</button><button class="fb" data-f="张真源">张真源</button><button class="fb" data-f="成毅">成毅</button><button class="fb" data-f="朱志鑫/苏新皓">朱志鑫/苏新皓</button><button class="fb" data-f="李荣浩">李荣浩</button><button class="fb" data-f="杨紫">杨紫</button><button class="fb" data-f="檀健次">檀健次</button><button class="fb" data-f="王一博">王一博</button><button class="fb" data-f="王俊凯">王俊凯</button><button class="fb" data-f="王大陆">王大陆</button><button class="fb" data-f="田栩宁">田栩宁</button><button class="fb" data-f="穆祉丞">穆祉丞</button><button class="fb" data-f="虞书欣">虞书欣</button><button class="fb" data-f="谢霆锋">谢霆锋</button><button class="fb" data-f="迪丽热巴">迪丽热巴</button><button class="fb" data-f="郭羡妮">郭羡妮</button><button class="fb" data-f="钟汉良">钟汉良</button><button class="fb" data-f="陈丽君">陈丽君</button><button class="fb" data-f="陈慧娴">陈慧娴</button><button class="fb" data-f="陈楚生">陈楚生</button><button class="fb" data-f="马嘉祺">马嘉祺</button></div>
+</div>
 <div class="ct"><div class="date-sep" data-date="2026-04-23"><span class="date-label">04月23日 · 今天</span></div>
 <div class="tl-row" id="c0" data-p="高" data-a="成毅" data-t="2026-04-23T15:15:00" data-d="2026-04-23">
   <div class="tl-time"><span class="hm">15:15</span><span class="tl-dot" style="background:#ef4444"></span></div>
@@ -121,22 +133,22 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
       <span class="artist">成毅</span>
       <span class="stype" style="background:#7c3aed">圈内教父</span>
     </div>
-    <div class="c-body">成毅V中文版杂志4月28日官宣，A/B双封面各限量2万册</div>
-    <div class="c-tags"><span class="tag">#成毅V杂志双封面#</span> <span class="tag">#4月28日官宣#</span></div>
+    <div class="c-body">成毅V中文版杂志预热官宣，分A/B两版封面各限量2万册，4月28日正式发布</div>
+    <div class="c-tags"><span class="tag">#成毅V杂志双封面限量版#</span> <span class="tag">#4月28日成毅V杂志官宣#</span></div>
   </div>
   </a>
 </div>
-<div class="tl-row" id="c1" data-p="高" data-a="丁程鑫" data-t="2026-04-23T14:28:00" data-d="2026-04-23">
-  <div class="tl-time"><span class="hm">14:28</span><span class="tl-dot" style="background:#ef4444"></span></div>
+<div class="tl-row" id="c1" data-p="中" data-a="丁程鑫" data-t="2026-04-23T14:28:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">14:28</span><span class="tl-dot" style="background:#f59e0b"></span></div>
   <a href="https://weibo.com/detail/5290872338122919" target="_blank" class="card-a">
-  <div class="tl-card" style="border-left-color:#ef4444">
+  <div class="tl-card" style="border-left-color:#f59e0b">
     <div class="c-head">
-      <span class="badge" style="background:#ef4444">高</span>
+      <span class="badge" style="background:#f59e0b">中</span>
       <span class="artist">丁程鑫</span>
       <span class="stype" style="background:#7c3aed">圈内教父</span>
     </div>
-    <div class="c-body">丁程鑫新歌4月27日正式上线，4月24日10点开启预约</div>
-    <div class="c-tags"><span class="tag">#丁程鑫新歌4月27日#</span> <span class="tag">#丁程鑫新歌预约开启#</span></div>
+    <div class="c-body">丁程鑫新歌发布节奏曝光：4月24日开启预约，4月27日10点正式上线</div>
+    <div class="c-tags"><span class="tag">#丁程鑫新歌4月27日上线#</span> <span class="tag">#丁程鑫新歌预约#</span></div>
   </div>
   </a>
 </div>
@@ -170,15 +182,15 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 </div>
 <div class="tl-row" id="c4" data-p="中" data-a="刘宇宁" data-t="2026-04-23T13:20:00" data-d="2026-04-23">
   <div class="tl-time"><span class="hm">13:20</span><span class="tl-dot" style="background:#f59e0b"></span></div>
-  <a href="https://weibo.com/detail/5290855135184628" target="_blank" class="card-a">
+  <a href="https://weibo.com/detail/5290852010426794" target="_blank" class="card-a">
   <div class="tl-card" style="border-left-color:#f59e0b">
     <div class="c-head">
       <span class="badge" style="background:#f59e0b">中</span>
       <span class="artist">刘宇宁</span>
       <span class="stype" style="background:#059669">粉丝</span>
     </div>
-    <div class="c-body">刘宇宁2025巡演南京站花絮发布，巡演纪录持续更新中</div>
-    <div class="c-tags"><span class="tag">#刘宇宁南京站花絮#</span> <span class="tag">#宁的2025巡演#</span></div>
+    <div class="c-body">刘宇宁新歌MV《平凡的日子借一点光》正式发布，同时《佳偶天成》破穹曲《生当何为》由央视新闻推介</div>
+    <div class="c-tags"><span class="tag">#刘宇宁新MV上线#</span> <span class="tag">#佳偶天成破穹曲#</span></div>
   </div>
   </a>
 </div>
@@ -192,12 +204,26 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
       <span class="stype" style="background:#059669">粉丝</span>
     </div>
     <div class="c-body">陈楚生《空中怪车事件》入选QQ音乐2026年Q1巅峰潮流榜十大单曲</div>
-    <div class="c-tags"><span class="tag">#陈楚生巅峰潮流榜单曲#</span> <span class="tag">#空中怪车事件上榜#</span></div>
+    <div class="c-tags"><span class="tag">#陈楚生空中怪车事件上榜#</span> <span class="tag">#陈楚生Q1巅峰潮流榜#</span></div>
   </div>
   </a>
 </div>
-<div class="tl-row" id="c6" data-p="中" data-a="迪丽热巴" data-t="2026-04-23T13:16:00" data-d="2026-04-23">
-  <div class="tl-time"><span class="hm">13:16</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+<div class="tl-row" id="c6" data-p="中" data-a="刘宇宁" data-t="2026-04-23T13:20:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">13:20</span><span class="tl-dot" style="background:#f59e0b"></span></div>
+  <a href="https://weibo.com/detail/5290855135184628" target="_blank" class="card-a">
+  <div class="tl-card" style="border-left-color:#f59e0b">
+    <div class="c-head">
+      <span class="badge" style="background:#f59e0b">中</span>
+      <span class="artist">刘宇宁</span>
+      <span class="stype" style="background:#059669">粉丝</span>
+    </div>
+    <div class="c-body">刘宇宁2025巡演南京站花絮发布，巡演纪录持续更新中</div>
+    <div class="c-tags"><span class="tag">#刘宇宁南京站花絮#</span> <span class="tag">#宁的2025巡演#</span></div>
+  </div>
+  </a>
+</div>
+<div class="tl-row" id="c7" data-p="中" data-a="迪丽热巴" data-t="2026-04-23T13:15:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">13:15</span><span class="tl-dot" style="background:#f59e0b"></span></div>
   <a href="https://weibo.com/detail/5290853964972926" target="_blank" class="card-a">
   <div class="tl-card" style="border-left-color:#f59e0b">
     <div class="c-head">
@@ -205,22 +231,8 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
       <span class="artist">迪丽热巴</span>
       <span class="stype" style="background:#059669">粉丝</span>
     </div>
-    <div class="c-body">《白日提灯》今日收官，迪丽热巴饰演角色贺思慕剧集角色新媒体指数居4月22日榜首</div>
-    <div class="c-tags"><span class="tag">#白日提灯今日收官#</span> <span class="tag">#贺思慕角色指数第一#</span></div>
-  </div>
-  </a>
-</div>
-<div class="tl-row" id="c7" data-p="中" data-a="刘宇宁" data-t="2026-04-23T13:08:00" data-d="2026-04-23">
-  <div class="tl-time"><span class="hm">13:08</span><span class="tl-dot" style="background:#f59e0b"></span></div>
-  <a href="https://weibo.com/detail/5290852010426794" target="_blank" class="card-a">
-  <div class="tl-card" style="border-left-color:#f59e0b">
-    <div class="c-head">
-      <span class="badge" style="background:#f59e0b">中</span>
-      <span class="artist">刘宇宁</span>
-      <span class="stype" style="background:#059669">粉丝</span>
-    </div>
-    <div class="c-body">刘宇宁新歌《平凡的日子借一点光》MV正式发布，首周腾讯音乐由你榜最高实时第7名</div>
-    <div class="c-tags"><span class="tag">#平凡的日子借一点光MV#</span> <span class="tag">#刘宇宁新歌上线#</span></div>
+    <div class="c-body">迪丽热巴主演剧集《白日提灯》今日收官，角色贺思慕占据Vlinkage剧集角色新媒体指数榜首</div>
+    <div class="c-tags"><span class="tag">#白日提灯今日收官#</span> <span class="tag">#贺思慕角色热度榜首#</span></div>
   </div>
   </a>
 </div>
@@ -322,17 +334,17 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
   </div>
   </a>
 </div>
-<div class="tl-row" id="c15" data-p="高" data-a="陈丽君" data-t="2026-04-23T11:40:00" data-d="2026-04-23">
-  <div class="tl-time"><span class="hm">11:40</span><span class="tl-dot" style="background:#ef4444"></span></div>
+<div class="tl-row" id="c15" data-p="中" data-a="陈丽君" data-t="2026-04-23T11:40:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">11:40</span><span class="tl-dot" style="background:#f59e0b"></span></div>
   <a href="https://weibo.com/detail/5290829947602038" target="_blank" class="card-a">
-  <div class="tl-card" style="border-left-color:#ef4444">
+  <div class="tl-card" style="border-left-color:#f59e0b">
     <div class="c-head">
-      <span class="badge" style="background:#ef4444">高</span>
+      <span class="badge" style="background:#f59e0b">中</span>
       <span class="artist">陈丽君</span>
       <span class="stype" style="background:#059669">粉丝</span>
     </div>
-    <div class="c-body">陈丽君领衔主演话剧《枕头人》12周年版成都站4月25-26日开演，倒计时2天</div>
-    <div class="c-tags"><span class="tag">#陈丽君枕头人成都站#</span> <span class="tag">#话剧枕头人本周末#</span></div>
+    <div class="c-body">陈丽君领衔主演话剧《枕头人》12周年版成都站4月25日开演，倒计时2天</div>
+    <div class="c-tags"><span class="tag">#陈丽君枕头人成都站#</span> <span class="tag">#枕头人12周年版#</span></div>
   </div>
   </a>
 </div>
@@ -359,8 +371,8 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
       <span class="artist">张真源</span>
       <span class="stype" style="background:#059669">粉丝</span>
     </div>
-    <div class="c-body">张真源参演综艺《奔跑吧14》4月24日19:30预告片上线，20:00浙江卫视正式播出</div>
-    <div class="c-tags"><span class="tag">#奔跑吧14张真源#</span> <span class="tag">#张真源整活新高度#</span></div>
+    <div class="c-body">张真源参演《奔跑吧14》4月24日19:30抢先看、20:00浙江卫视正式播出</div>
+    <div class="c-tags"><span class="tag">#张真源奔跑吧14明晚播出#</span> <span class="tag">#奔跑吧4月24日#</span></div>
   </div>
   </a>
 </div>
@@ -415,8 +427,8 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
       <span class="artist">穆祉丞</span>
       <span class="stype" style="background:#7c3aed">圈内教父</span>
     </div>
-    <div class="c-body">穆祉丞《等待一切重来》入选QQ音乐2026年Q1巅峰潮流榜十大单曲，894次上榜66次夺冠</div>
-    <div class="c-tags"><span class="tag">#穆祉丞巅峰榜十大单曲#</span> <span class="tag">#等待一切重来894次上榜#</span></div>
+    <div class="c-body">QQ音乐2026年Q1巅峰潮流榜揭晓，穆祉丞《等待一切重来》入选十大单曲，累计894次上榜、66次夺冠</div>
+    <div class="c-tags"><span class="tag">#穆祉丞等待一切重来894次上榜#</span> <span class="tag">#穆祉丞Q1巅峰榜十大单曲#</span></div>
   </div>
   </a>
 </div>
@@ -434,17 +446,17 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
   </div>
   </a>
 </div>
-<div class="tl-row" id="c23" data-p="高" data-a="王俊凯" data-t="2026-04-23T11:00:00" data-d="2026-04-23">
-  <div class="tl-time"><span class="hm">11:00</span><span class="tl-dot" style="background:#ef4444"></span></div>
+<div class="tl-row" id="c23" data-p="中" data-a="王俊凯" data-t="2026-04-23T11:00:00" data-d="2026-04-23">
+  <div class="tl-time"><span class="hm">11:00</span><span class="tl-dot" style="background:#f59e0b"></span></div>
   <a href="https://weibo.com/detail/5290820032793394" target="_blank" class="card-a">
-  <div class="tl-card" style="border-left-color:#ef4444">
+  <div class="tl-card" style="border-left-color:#f59e0b">
     <div class="c-head">
-      <span class="badge" style="background:#ef4444">高</span>
+      <span class="badge" style="background:#f59e0b">中</span>
       <span class="artist">王俊凯</span>
       <span class="stype" style="background:#7c3aed">圈内教父</span>
     </div>
-    <div class="c-body">王俊凯入选QQ音乐巅峰榜2026Q1十大艺人，新歌《无人乐园》同获十大单曲双料荣誉</div>
-    <div class="c-tags"><span class="tag">#王俊凯Q1双料巅峰榜#</span> <span class="tag">#无人乐园十大单曲#</span></div>
+    <div class="c-body">QQ音乐2026年Q1巅峰榜揭晓，王俊凯获十大艺人，新歌《无人乐园》同时入选十大单曲</div>
+    <div class="c-tags"><span class="tag">#王俊凯Q1双榜上榜#</span> <span class="tag">#无人乐园巅峰榜十大单曲#</span></div>
   </div>
   </a>
 </div>
@@ -513,8 +525,8 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
       <span class="artist">周深</span>
       <span class="stype" style="background:#059669">粉丝</span>
     </div>
-    <div class="c-body">第十六届北京国际电影节闭幕式阵容官宣，周深确认出席</div>
-    <div class="c-tags"><span class="tag">#周深亮相北影节闭幕式#</span> <span class="tag">#北影节第十六届#</span></div>
+    <div class="c-body">周深确认出席第十六届北京国际电影节闭幕式，同时QQ音乐2026年Q1巅峰榜双榜入围十大艺人及十大单曲</div>
+    <div class="c-tags"><span class="tag">#周深北影节闭幕式#</span> <span class="tag">#周深Q1双榜入围#</span></div>
   </div>
   </a>
 </div>
@@ -555,8 +567,8 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
       <span class="artist">田栩宁</span>
       <span class="stype" style="background:#059669">粉丝</span>
     </div>
-    <div class="c-body">华策影视财报披露田栩宁相关业务营收大涨，经纪及音乐业务增长1.8亿，股价涨幅超10%</div>
-    <div class="c-tags"><span class="tag">#田栩宁带飞华策股价#</span> <span class="tag">#华策财报涨1.8亿#</span></div>
+    <div class="c-body">华策影视财报披露田栩宁相关业务营收大涨，经纪及音乐业务共增长1.8亿，股价当日涨幅达10%</div>
+    <div class="c-tags"><span class="tag">#华策田栩宁业务增长1.8亿#</span> <span class="tag">#田栩宁带飞华策股价#</span></div>
   </div>
   </a>
 </div>
@@ -611,8 +623,8 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
       <span class="artist">迪丽热巴</span>
       <span class="stype" style="background:#059669">粉丝</span>
     </div>
-    <div class="c-body">迪丽热巴方正式公告：已委托律师启动诉讼，针对AI换脸侵权及网络诽谤等行为维权</div>
-    <div class="c-tags"><span class="tag">#迪丽热巴方启动诉讼维权#</span> <span class="tag">#AI换脸侵权零容忍#</span></div>
+    <div class="c-body">迪丽热巴方正式公告：已委托律师对网络侮辱诽谤及AI换脸侵权行为启动诉讼程序</div>
+    <div class="c-tags"><span class="tag">#迪丽热巴方启动维权诉讼#</span> <span class="tag">#AI换脸侵权零容忍#</span></div>
   </div>
   </a>
 </div>
@@ -940,8 +952,8 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 </div></div>
 </div>
 <aside class="live">
-<div class="live-hd">
-<h3><span class="live-dot"></span> 实时信号</h3>
+<div class="live-hd" onclick="var f=document.getElementById('liveFeed');f.style.display=f.style.display==='none'?'':'none';this.querySelector('.toggle').textContent=f.style.display==='none'?'▶':'▼'">
+<h3><span class="live-dot"></span> 实时信号 <span class="toggle mobile-only">▼</span></h3>
 <div class="live-meta"><span id="liveDate"></span> · 每15分钟轮询 · <span id="liveTime">加载中</span></div>
 </div>
 <div class="live-feed" id="liveFeed">
